@@ -1,12 +1,26 @@
 """Raphael notifications service."""
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from raphael_contracts.errors import ErrorResponse
-from raphael_notifications.routes import router
+from raphael_notifications.routes import handle_event, router
 
-app = FastAPI(title="raphael-notifications", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        from raphael_contracts.kafka import start_consumer
+
+        start_consumer(lambda env: handle_event(env.get("type", ""), env.get("data", {})))
+    except Exception:
+        pass
+    yield
+
+
+app = FastAPI(title="raphael-notifications", version="0.1.0", lifespan=lifespan)
 app.include_router(router, prefix="/v1/notifications")
 
 
