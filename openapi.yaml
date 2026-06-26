@@ -1,0 +1,12 @@
+openapi: 3.1.0
+info:
+  title: raphael-notifications
+  version: 0.1.0
+  description: In-app inbox, preferences, email/push routing via external providers
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
