@@ -157,6 +157,17 @@ class NotificationsStore:
                 conn.commit()
         return {"id": notification_id, "read": True}
 
+    def mark_all_read(self, user_id: str) -> int:
+        if self._postgres:
+            from raphael_contracts.db import pg_execute
+
+            cur = pg_execute("UPDATE notifications SET read = TRUE WHERE user_id = %s AND read = FALSE", (user_id,))
+            return int(cur.rowcount)
+        with self._connect_sqlite() as conn:
+            cur = conn.execute("UPDATE notifications SET read = 1 WHERE user_id = ? AND read = 0", (user_id,))
+            conn.commit()
+            return int(cur.rowcount)
+
     def get_prefs(self, user_id: str) -> dict[str, bool]:
         table = self._prefs_table()
         row = self._fetchone(

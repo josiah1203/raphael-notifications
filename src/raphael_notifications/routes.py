@@ -149,6 +149,13 @@ def mark_read(
     return result
 
 
+@router.post("/mark-all-read")
+def mark_all_read(x_raphael_user_id: str | None = Header(default="usr_default")) -> dict[str, Any]:
+    user_id = x_raphael_user_id or "usr_default"
+    count = _store.mark_all_read(user_id)
+    return {"status": "ok", "count": count}
+
+
 @router.get("/preferences")
 def get_preferences(x_raphael_user_id: str | None = Header(default="usr_default")) -> dict[str, bool]:
     return _store.get_prefs(x_raphael_user_id or "usr_default")
